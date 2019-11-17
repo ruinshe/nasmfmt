@@ -51,8 +51,10 @@ func process(command *cobra.Command, args []string) {
 			buffer.WriteString(formatted)
 			indent = 4
 		} else {
-			for i := 0; i < indent; i++ {
-				buffer.WriteString(" ")
+			if len(formatted) > 0 {
+				for i := 0; i < indent; i++ {
+					buffer.WriteString(" ")
+				}
 			}
 			buffer.WriteString(formatted)
 
