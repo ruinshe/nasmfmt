@@ -2,6 +2,7 @@ package main
 
 import (
 	"bufio"
+	"bytes"
 	"fmt"
 	"github.com/spf13/cobra"
 	"io"
@@ -17,15 +18,22 @@ var rootCommand = &cobra.Command{
 
 This simple program will read the nasm file as stdin and output the formatted script
 as stdout.`,
-	Version: "0.0.2",
-	Args:    cobra.NoArgs,
+	Version: "0.1.0",
+	Args:    cobra.ExactArgs(1),
 	Run:     process,
 }
 
 func process(command *cobra.Command, args []string) {
+	f, err := os.Open(args[0])
+	if err != nil {
+		log.Fatal(fmt.Sprintf("Error occurs when opening file: %s", args[0]), err)
+		os.Exit(1)
+	}
+
 	// Directly read the string from stdin.
-	reader := bufio.NewReader(os.Stdin)
+	reader := bufio.NewReader(f)
 	indent := 0
+	buffer := bytes.Buffer{}
 
 	for {
 		line, err := reader.ReadString('\n')
@@ -40,15 +48,25 @@ func process(command *cobra.Command, args []string) {
 		tokens := strings.Fields(line)
 		formatted := strings.Join(tokens, " ")
 		if len(tokens) == 1 && tokens[0][len(tokens[0])-1] == ':' {
-			fmt.Println(formatted)
+			buffer.WriteString(formatted)
 			indent = 4
 		} else {
 			for i := 0; i < indent; i++ {
-				fmt.Print(" ")
+				buffer.WriteString(" ")
 			}
-			fmt.Println(formatted)
+			buffer.WriteString(formatted)
 		}
+		buffer.WriteString("\n")
 	}
+	f.Close()
+
+	f, err = os.Create(args[0])
+	if err != nil {
+		log.Fatal(fmt.Sprintf("Error occurs when creating file: %s", args[0]), err)
+		os.Exit(1)
+	}
+	f.WriteString(buffer.String())
+	f.Close()
 }
 
 func main() {

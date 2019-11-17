@@ -1,4 +1,4 @@
-This script is a simple script to format nasm string as stdin.
+This script is a simple script to format nasm string from specific file.
 
 ![](https://github.com/ruinshe/nasmfmt/workflows/.github/workflows/go.yml/badge.svg)
 
