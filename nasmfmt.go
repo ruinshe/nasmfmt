@@ -17,7 +17,8 @@ var rootCommand = &cobra.Command{
 
 This simple program will read the nasm file as stdin and output the formatted script
 as stdout.`,
-	Version: "0.0.1",
+	Version: "0.0.2",
+	Args:    cobra.NoArgs,
 	Run:     process,
 }
 
@@ -51,6 +52,9 @@ func process(command *cobra.Command, args []string) {
 }
 
 func main() {
+	rootCommand.PersistentFlags().BoolP("write", "w", true,
+		"Write the file (excluded for bypass Emacs).")
+
 	err := rootCommand.Execute()
 	if err != nil {
 		log.Fatal("Error occurs when executing conversion.", err)
