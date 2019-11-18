@@ -18,7 +18,7 @@ var rootCommand = &cobra.Command{
 
 This simple program will read the nasm file as stdin and output the formatted script
 as stdout.`,
-	Version: "0.1.1",
+	Version: "0.2.0",
 	Args:    cobra.ExactArgs(1),
 	Run:     process,
 }
