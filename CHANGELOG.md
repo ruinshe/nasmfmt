@@ -1,6 +1,8 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+## [0.3.0] - preview
+- Make the comment line not splitted, keep it is.
 
 ## [0.2.0] - Nov 17th, 2019
 ### Added
