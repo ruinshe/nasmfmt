@@ -7,6 +7,7 @@
 
 	Fix
 	- Stop spliting the whitespaces in the strings (simple version).
+	- mis-indent when the colon is end of comment(s).
 
 	* 0.2.0 - Nov 17th, 2019
 

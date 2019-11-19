@@ -18,7 +18,7 @@ var rootCommand = &cobra.Command{
 
 This simple program will read the nasm file as stdin and output the formatted script
 as stdout.`,
-	Version: "0.2.3",
+	Version: "0.2.4",
 	Args:    cobra.ExactArgs(1),
 	Run:     format,
 }
@@ -71,14 +71,19 @@ func process(reader *bufio.Reader, buffer *bytes.Buffer) {
 		}
 
 		formatted := strings.Join(tokens, " ")
-		if len(tokens) == 1 && tokens[0][len(tokens[0])-1] == ':' {
+		if len(tokens) > 0 {
+			current = tokens[len(tokens)-1]
+		} else {
+			current = ""
+		}
+		if len(formatted) == 0 {
+			// Skip for empty block
+		} else if !strings.HasPrefix(current, ";") && formatted[len(current)-1] == ':' {
 			buffer.WriteString(formatted)
 			indent = 4
 		} else {
-			if len(formatted) > 0 {
-				for i := 0; i < indent; i++ {
-					buffer.WriteString(" ")
-				}
+			for i := 0; i < indent; i++ {
+				buffer.WriteString(" ")
 			}
 			buffer.WriteString(formatted)
 

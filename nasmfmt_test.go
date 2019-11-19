@@ -74,3 +74,25 @@ func TestProcess_AnotherStringCase(t *testing.T) {
 	// The source will not be formatted
 	assert.Equal(t, source, buffer.String())
 }
+
+func TestProcess_ColonInSuffixComent(t *testing.T) {
+	source := `mov ss, ax ; the comment:
+mov cs, ax
+`
+	reader := bufio.NewReader(strings.NewReader(source))
+	buffer := bytes.Buffer{}
+	process(reader, &buffer)
+	// The source will not be formatted
+	assert.Equal(t, source, buffer.String())
+}
+
+func TestProcess_ColonInLineComent(t *testing.T) {
+	source := `;; the comment:
+mov cs, ax
+`
+	reader := bufio.NewReader(strings.NewReader(source))
+	buffer := bytes.Buffer{}
+	process(reader, &buffer)
+	// The source will not be formatted
+	assert.Equal(t, source, buffer.String())
+}
