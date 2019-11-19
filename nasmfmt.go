@@ -18,22 +18,13 @@ var rootCommand = &cobra.Command{
 
 This simple program will read the nasm file as stdin and output the formatted script
 as stdout.`,
-	Version: "0.2.2",
+	Version: "0.2.3",
 	Args:    cobra.ExactArgs(1),
-	Run:     process,
+	Run:     format,
 }
 
-func process(command *cobra.Command, args []string) {
-	f, err := os.Open(args[0])
-	if err != nil {
-		log.Fatal(fmt.Sprintf("Error occurs when opening file: %s", args[0]), err)
-		os.Exit(1)
-	}
-
-	// Directly read the string from stdin.
-	reader := bufio.NewReader(f)
+func process(reader *bufio.Reader, buffer *bytes.Buffer) {
 	indent := 0
-	buffer := bytes.Buffer{}
 
 	for {
 		// Actually here second returned value isPrefix may be false,
@@ -46,14 +37,39 @@ func process(command *cobra.Command, args []string) {
 			log.Fatal("Reading error from stdin: ", err)
 			os.Exit(1)
 		}
-
-		var tokens []string
 		trimed := strings.TrimSpace(string(line))
-		if strings.HasPrefix(trimed, ";;") {
-			tokens = []string{trimed}
-		} else {
-			tokens = strings.Fields(trimed)
+
+		// Process the token splitting.
+		var tokens []string
+		inString := false
+		current := ""
+		for i, c := range trimed {
+			if !inString && c == ';' {
+				// In this case, we directly using suffix.
+				current += string(trimed[i:])
+				break
+			} else if c == ' ' {
+				if !inString && len(current) > 0 {
+					tokens = append(tokens, current)
+					current = ""
+				} else if inString {
+					current += string(c)
+				}
+			} else if c == '"' {
+				if inString && trimed[i-1] == '\\' {
+					// "...\" case.
+				} else {
+					inString = !inString
+				}
+				current += string(c)
+			} else {
+				current += string(c)
+			}
 		}
+		if len(current) > 0 {
+			tokens = append(tokens, current)
+		}
+
 		formatted := strings.Join(tokens, " ")
 		if len(tokens) == 1 && tokens[0][len(tokens[0])-1] == ':' {
 			buffer.WriteString(formatted)
@@ -72,6 +88,18 @@ func process(command *cobra.Command, args []string) {
 		}
 		buffer.WriteString("\n")
 	}
+}
+
+func format(command *cobra.Command, args []string) {
+	f, err := os.Open(args[0])
+	if err != nil {
+		log.Fatal(fmt.Sprintf("Error occurs when opening file: %s", args[0]), err)
+		os.Exit(1)
+	}
+
+	reader := bufio.NewReader(f)
+	buffer := bytes.Buffer{}
+	process(reader, &buffer)
 	f.Close()
 
 	f, err = os.Create(args[0])
