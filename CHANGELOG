@@ -1,5 +1,10 @@
 	All notable changes to this project will be documented in this file.
 
+	* 0.4.0 - preview
+
+	Fix
+	- Fix wrong indentation at some cases caused by misuse variable.
+
 	* 0.3.0 - Nov 20th, 2019
 
 	Add

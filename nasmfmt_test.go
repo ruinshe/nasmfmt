@@ -96,3 +96,16 @@ mov cs, ax
 	// The source will not be formatted
 	assert.Equal(t, source, buffer.String())
 }
+
+func TestProcess_ColonsInContinousLines(t *testing.T) {
+	source := `A: db 0
+B: db "hello world!"
+GetSVGAVBEInfoErrMessage: db "Get SVGA VBE Info ERROR"
+GetSVGAVBEInfoOKMessage: db "Get SVGA VBE Info SUCCESSFUL!"
+`
+	reader := bufio.NewReader(strings.NewReader(source))
+	buffer := bytes.Buffer{}
+	process(reader, &buffer)
+	// The source will not be formatted
+	assert.Equal(t, source, buffer.String())
+}
